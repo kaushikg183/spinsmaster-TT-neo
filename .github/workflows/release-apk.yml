@@ -15,10 +15,10 @@ jobs:
       - name: Checkout Web App Files
         uses: actions/checkout@v4
 
-      - name: Set up Node.js
+      - name: Set up Node.js 22
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
 
       - name: Set up JDK 21 for Android
         uses: actions/setup-java@v4
@@ -30,8 +30,8 @@ jobs:
         run: |
           mkdir -p www
           cp index.html manifest.json sw.js icon.svg www/
-          npm init -y
-          npm install @capacitor/core @capacitor/cli @capacitor/android
+          echo '{"name":"spinmaster-tt-neon","version":"1.0.0","private":true}' > package.json
+          npm install @capacitor/core@6 @capacitor/cli@6 @capacitor/android@6
           npx cap init "SpinMaster TT" "com.kaushikg183.spinmastertt" --web-dir www
           npx cap add android
           npx cap sync android
@@ -40,7 +40,7 @@ jobs:
         working-directory: ./android
         run: |
           chmod +x gradlew
-          ./gradlew assembleDebug
+          ./gradlew assembleDebug --no-daemon
 
       - name: Rename APK for 1-Tap Link
         run: cp android/app/build/outputs/apk/debug/app-debug.apk SpinMaster-TT.apk
@@ -55,3 +55,5 @@ jobs:
             Tap **SpinMaster-TT.apk** below to install directly on Android without signing into GitHub.
           files: SpinMaster-TT.apk
           prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

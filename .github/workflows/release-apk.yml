@@ -12,28 +12,44 @@ jobs:
   build-and-release:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Repository
+      - name: Checkout Web App Files
         uses: actions/checkout@v4
 
-      - name: Set up JDK 17
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Set up JDK 21 for Android
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
-          java-version: '17'
+          java-version: '21'
 
-      - name: Build Debug APK
+      - name: Wrap HTML into Android Project via Capacitor
+        run: |
+          mkdir -p www
+          cp index.html manifest.json sw.js icon.svg www/
+          npm init -y
+          npm install @capacitor/core @capacitor/cli @capacitor/android
+          npx cap init "SpinMaster TT" "com.kaushikg183.spinmastertt" --web-dir www
+          npx cap add android
+          npx cap sync android
+
+      - name: Build Debug APK with Gradle
+        working-directory: ./android
         run: |
           chmod +x gradlew
           ./gradlew assembleDebug
 
-      - name: Rename APK for Permanent 1-Tap Download Link
-        run: cp app/build/outputs/apk/debug/app-debug.apk SpinMaster-TT.apk
+      - name: Rename APK for 1-Tap Link
+        run: cp android/app/build/outputs/apk/debug/app-debug.apk SpinMaster-TT.apk
 
-      - name: Publish Public APK Release (Zero Login Required)
+      - name: Publish Public APK Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: v1.0.0-latest
-          name: SpinMaster TT (Latest Android APK)
+          name: SpinMaster TT Neon (Latest Android APK)
           body: |
             ### 🏓 Direct 1-Tap Android Download
             Tap **SpinMaster-TT.apk** below to install directly on Android without signing into GitHub.

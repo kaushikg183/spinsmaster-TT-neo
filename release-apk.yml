@@ -1,0 +1,41 @@
+name: Build & Publish Public SpinMaster-TT APK
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Build Debug APK
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleDebug
+
+      - name: Rename APK for Permanent 1-Tap Download Link
+        run: cp app/build/outputs/apk/debug/app-debug.apk SpinMaster-TT.apk
+
+      - name: Publish Public APK Release (Zero Login Required)
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v1.0.0-latest
+          name: SpinMaster TT (Latest Android APK)
+          body: |
+            ### 🏓 Direct 1-Tap Android Download
+            Tap **SpinMaster-TT.apk** below to install directly on Android without signing into GitHub.
+          files: SpinMaster-TT.apk
+          prerelease: false

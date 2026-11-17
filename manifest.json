@@ -1,0 +1,18 @@
+{
+  "name": "SpinMaster TT // Neon Court",
+  "short_name": "SpinMaster TT",
+  "description": "1v1 & 2v2 Table Tennis Match Scorer, Serve Tracker, Voice Announcer & Live Invite",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#07090f",
+  "theme_color": "#00f3ff",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
